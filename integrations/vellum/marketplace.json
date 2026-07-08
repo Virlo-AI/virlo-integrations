@@ -1,0 +1,23 @@
+{
+  "name": "virlo",
+  "display_name": "Virlo — Short-Form Social Intelligence",
+  "description": "Ask 'what's going viral in my niche right now, and why?' — real-time TikTok, YouTube Shorts, and Instagram Reels intelligence via Virlo Content Research Agents, with weighted virality score, rising-creator outliers, winning formats, and regional AI trend analysis.",
+  "owner": {
+    "name": "Virlo",
+    "url": "https://virlo.ai"
+  },
+  "source": {
+    "repo": "Virlo-AI/virlo-integrations",
+    "path": "integrations/vellum",
+    "ref": "main"
+  },
+  "manifest": "integrations/vellum/manifest.json",
+  "homepage": "https://dev.virlo.ai",
+  "documentation": "https://dev.virlo.ai/docs",
+  "categories": ["research", "social-media", "analytics", "marketing"],
+  "backlink": "https://virlo.ai",
+  "_notes": [
+    "This is the reference entry Vellum lists in their marketplace repo (e.g. vellum-ai/marketplace). The plugin source stays here in Virlo-AI/virlo-integrations; Vellum's marketplace just points at it via `source`.",
+    "TODO(vellum): match Vellum's exact marketplace.json schema (the vellum-assistant example used a top-level `owner` block) — adjust keys as Vargas specifies."
+  ]
+}

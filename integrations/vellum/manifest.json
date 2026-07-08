@@ -1,0 +1,74 @@
+{
+  "schema_version": "v1",
+  "name": "virlo",
+  "display_name": "Virlo — Short-Form Social Intelligence",
+  "version": "0.1.0",
+  "description": "Real-time short-form video intelligence across TikTok, YouTube Shorts, and Instagram Reels, powered by Virlo Content Research Agents. Ask 'what's going viral in my niche right now, and why?' and get Virlo's weighted virality score, rising-creator outliers, winning formats, and regional AI trend analysis.",
+  "tagline": "What's going viral in your niche right now — and why.",
+  "author": {
+    "name": "Virlo",
+    "url": "https://virlo.ai",
+    "email": "support@virlo.ai"
+  },
+  "license": "MIT",
+  "categories": ["research", "social-media", "analytics", "marketing"],
+  "keywords": [
+    "tiktok",
+    "youtube-shorts",
+    "instagram-reels",
+    "viral",
+    "trends",
+    "creators",
+    "market-research",
+    "social-intelligence",
+    "content-research-agents"
+  ],
+  "skill": "SKILL.md",
+  "playbook": "agent-playbook.md",
+  "connection": {
+    "type": "mcp",
+    "mcp": "mcp.json",
+    "fallback": {
+      "type": "rest",
+      "base_url": "https://api.virlo.ai/v1",
+      "auth": {
+        "type": "bearer",
+        "config_key": "api_key"
+      }
+    }
+  },
+  "config": {
+    "api_key": {
+      "type": "string",
+      "required": true,
+      "secret": true,
+      "label": "Virlo API key",
+      "description": "Your Virlo API key (format: virlo_tkn_<your_key>).",
+      "setup_url": "https://dev.virlo.ai/dashboard",
+      "pattern": "^virlo_tkn_[A-Za-z0-9]+$"
+    }
+  },
+  "onboarding": {
+    "account_signup_url": "https://dev.virlo.ai/dashboard",
+    "billing_url": "https://dev.virlo.ai/dashboard/billing",
+    "steps": [
+      "Create a free Virlo account at https://dev.virlo.ai/dashboard",
+      "Generate an API key (starts with virlo_tkn_)",
+      "Add a prepaid balance (minimum $10 — pay-as-you-go, no subscription)",
+      "Paste your API key into the Virlo connection settings"
+    ]
+  },
+  "billing": {
+    "model": "byo_key",
+    "note": "Tiering, credits, and rate limits are enforced by Virlo server-side. This plugin does not gate features. Users pay Virlo directly via their own prepaid balance."
+  },
+  "support": {
+    "homepage": "https://dev.virlo.ai",
+    "documentation": "https://dev.virlo.ai/docs",
+    "issues": "https://github.com/Virlo-AI/virlo-integrations/issues"
+  },
+  "_notes": [
+    "TODO(vellum): confirm the exact manifest schema Vellum expects and align field names. This file captures the plugin contract; adjust the wrapper keys to match Vellum's plugin spec.",
+    "Auth: primary path is BYO API key (virlo_tkn_). If Vellum prefers managed OAuth, Virlo's hosted MCP server supports an OAuth key-mint flow — swap connection.mcp.auth accordingly."
+  ]
+}

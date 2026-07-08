@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "virlo": {
+      "url": "https://dev.virlo.ai/api/mcp",
+      "transport": "http",
+      "description": "Virlo hosted MCP server — short-form social intelligence (Content Research Agents, Satellite, trends, sounds, tracking).",
+      "auth": {
+        "type": "bearer",
+        "token": "{config.api_key}"
+      }
+    }
+  },
+  "_notes": [
+    "This connects Vellum assistants directly to Virlo's hosted MCP server, which already exposes the Content Research Agent / Satellite / trends tools — so the plugin does not re-implement the API.",
+    "TODO(vellum): confirm the transport suffix Vellum uses. The hosted server is a catch-all route (app/api/mcp/[transport]); typical values are 'http' (streamable) at https://dev.virlo.ai/api/mcp/http or 'sse' at https://dev.virlo.ai/api/mcp/sse.",
+    "Auth: Bearer virlo_tkn_ is the BYO-key path. If using Vellum-managed OAuth, replace 'auth' with the OAuth config and rely on Virlo's mint-oauth-key flow.",
+    "Relevant MCP tools for this integration (all backed by the unified /v1/agents Content Research Agent resource): search_keywords + get_keyword_search_results (one-shot search), create_niche_monitor + get_niche_monitor_data (recurring monitor), lookup_creator / lookup_sound / analyze_video / get_satellite_run (Satellite), get_trends / get_trends_digest (regional trends), check_job_status, get_credit_balance.",
+    "NOTE(virlo): the current hosted tool names (search_keywords, create_niche_monitor, ...) are legacy-flavored but already route to /v1/agents. If/when Virlo ships CRA-named MCP tools (e.g. create_content_research_agent), update this list to prefer them."
+  ]
+}
