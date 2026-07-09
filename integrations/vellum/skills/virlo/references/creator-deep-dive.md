@@ -12,13 +12,13 @@ For "tell me about this creator" or "why did this video pop?"
 
 ```bash
 curl "https://api.virlo.ai/v1/satellite/creator/tiktok/londonfitguy?include=videos,outliers&cross_links=true&max_videos=50" \
-  -H "Authorization: Bearer {api_key}"
+  -H "Authorization: Bearer $(assistant credentials reveal --service virlo --field api_key)"
 ```
 
 This returns a `job_id`. Poll until complete:
 
 ```bash
-curl "https://api.virlo.ai/v1/satellite/creator/status/{job_id}" -H "Authorization: Bearer {api_key}"
+curl "https://api.virlo.ai/v1/satellite/creator/status/{job_id}" -H "Authorization: Bearer $(assistant credentials reveal --service virlo --field api_key)"
 ```
 
 Creator lookups finish in ~20–60s.
@@ -34,7 +34,7 @@ Creator lookups finish in ~20–60s.
 
 ```bash
 curl -X POST "https://api.virlo.ai/v1/satellite/video-outlier" \
-  -H "Authorization: Bearer {api_key}" \
+  -H "Authorization: Bearer $(assistant credentials reveal --service virlo --field api_key)" \
   -H "Content-Type: application/json" \
   -d '{ "url": "https://www.tiktok.com/@londonfitguy/video/...", "platform": "tiktok" }'
 ```

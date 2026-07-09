@@ -1,0 +1,25 @@
+{
+  "name": "virlo",
+  "version": "0.1.0",
+  "description": "Real-time short-form video intelligence across TikTok, YouTube Shorts, and Instagram Reels, powered by Virlo Content Research Agents.",
+  "author": {
+    "name": "Virlo",
+    "url": "https://virlo.ai",
+    "email": "support@virlo.ai"
+  },
+  "license": "MIT",
+  "keywords": [
+    "tiktok",
+    "youtube-shorts",
+    "instagram-reels",
+    "viral",
+    "trends",
+    "creators",
+    "market-research",
+    "social-intelligence",
+    "content-research-agents"
+  ],
+  "peerDependencies": {
+    "@vellumai/plugin-api": "^0.10.3"
+  }
+}

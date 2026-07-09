@@ -12,7 +12,7 @@ For "keep an eye on X and tell me what changes." A great fit for Vellum's always
 
 ```bash
 curl -X POST "https://api.virlo.ai/v1/agents" \
-  -H "Authorization: Bearer {api_key}" \
+  -H "Authorization: Bearer $(assistant credentials reveal --service virlo --field api_key)" \
   -H "Content-Type: application/json" \
   -d '{
     "is_recurring": true,
@@ -33,13 +33,13 @@ Register `content_research_agent.run.completed` (via the `/v1/webhooks…` manag
 
 ```bash
 # New trends this cycle (follow across cycles via stable_key)
-curl "https://api.virlo.ai/v1/agents/{id}/trends/latest" -H "Authorization: Bearer {api_key}"
+curl "https://api.virlo.ai/v1/agents/{id}/trends/latest" -H "Authorization: Bearer $(assistant credentials reveal --service virlo --field api_key)"
 
 # Rising creators by run-over-run velocity
-curl "https://api.virlo.ai/v1/agents/{id}/creators/outliers?order_by=rising&limit=10" -H "Authorization: Bearer {api_key}"
+curl "https://api.virlo.ai/v1/agents/{id}/creators/outliers?order_by=rising&limit=10" -H "Authorization: Bearer $(assistant credentials reveal --service virlo --field api_key)"
 
 # Rising sounds
-curl "https://api.virlo.ai/v1/agents/{id}/sounds?sort=rising&limit=10" -H "Authorization: Bearer {api_key}"
+curl "https://api.virlo.ai/v1/agents/{id}/sounds?sort=rising&limit=10" -H "Authorization: Bearer $(assistant credentials reveal --service virlo --field api_key)"
 ```
 
 Frame the weekly update as a diff: what's `new`/`rising` vs last week, which creators accelerated, which sounds are breaking out.
