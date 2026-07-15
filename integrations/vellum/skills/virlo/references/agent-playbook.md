@@ -83,4 +83,4 @@ On recurring Content Research Agents, follow a single trend across cycles via it
 - Satellite runs persist a `run_id` — re-read free forever via `GET /v1/satellite/runs/:run_id`. Store run_ids in memory.
 - Recurring agents are free to create and only bill per scheduled run — set one up instead of re-running one-shot searches on the same niche.
 - Don't enable `data_intelligence_enabled` (+$1.00) unless the user actually wants a content-format teardown.
-- Surface `X-Balance-Remaining` proactively when it dips below $10.
+- Check the balance with the free `GET /v1/account/balance` endpoint and surface it proactively when it dips below $10. (The `x-balance-remaining` response header is only present when the live balance is resolvable on that request, so don't rely on it.)

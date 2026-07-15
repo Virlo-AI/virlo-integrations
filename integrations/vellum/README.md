@@ -14,7 +14,7 @@ vellum exec my-assistant -- assistant credentials set "virlo_tkn_<your_key>" \
 
 # 3. Install the Virlo plugin (triggers the init hook)
 vellum exec my-assistant -- assistant plugins install \
-  https://github.com/vellum-ai/virlo-integrations/tree/main/integrations/vellum --name virlo
+  https://github.com/Virlo-AI/virlo-integrations/tree/main/integrations/vellum --name virlo
 
 # 4. Start a conversation
 vellum message my-assistant "what's going viral in fitness on TikTok right now?"

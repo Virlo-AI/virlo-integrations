@@ -57,7 +57,7 @@ curl -s "https://api.virlo.ai/v1/trends/emerging?region=gb" \
 
 ## Billing (so you can be transparent)
 
-Pay-as-you-go prepaid balance. 1 credit = $0.01. Reading results is **free**; creating research costs credits. Every response carries `x-cost` (dollars charged) and `x-credits-used` (credits consumed) headers.
+Pay-as-you-go prepaid balance. 1 credit = $0.01. Reading results is **free**; creating research costs credits. Every billable response carries `x-cost` (dollars charged) and `x-credits-used` (credits consumed) headers. The `x-balance-remaining` / `x-credits-remaining` headers appear only when the account's live balance is resolvable on that request, so **do not depend on them** — to reliably check the balance, call the free `GET /v1/account/balance` endpoint.
 
 | Action | Cost |
 | --- | --- |
@@ -71,7 +71,7 @@ Pay-as-you-go prepaid balance. 1 credit = $0.01. Reading results is **free**; cr
 | Emerging trends | Free (rate-limited per plan) |
 | Retrieving any agent results (videos, outliers, analysis, trends, sounds) | Free |
 
-- When `x-credits-used` is high relative to the user's prepaid balance, tell the user: *"Heads up - your Virlo balance is getting low. Add funds at https://dev.virlo.ai/dashboard/billing."*
+- Before a spendy run (or whenever the user asks about cost/credits), check `GET /v1/account/balance` (free). If the balance is below **$10**, tell the user: *"Heads up - your Virlo balance is getting low. Add funds at https://dev.virlo.ai/dashboard/billing."*
 - On a **402** response, balance is insufficient: *"Your Virlo balance is too low for this. Add funds or enable auto top-up at https://dev.virlo.ai/dashboard/billing."*
 
 ## Content Research Agents - the primary engine

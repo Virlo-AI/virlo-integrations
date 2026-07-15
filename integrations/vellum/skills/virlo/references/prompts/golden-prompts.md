@@ -37,5 +37,5 @@ Expected: create a recurring Content Research Agent (`is_recurring: true`, `cade
 ## Billing edge cases the assistant must handle gracefully
 
 - **Out of credits (402):** APIs *do* return out of credits — surface it plainly and link https://dev.virlo.ai/dashboard/billing. Never fail silently.
-- **Low balance:** when `X-Balance-Remaining` < $10, proactively warn.
+- **Low balance:** check `GET /v1/account/balance` (free); when it's < $10, proactively warn. (Don't rely on the `x-balance-remaining` header — it's only present when the balance is resolvable on that request.)
 - **Free vs Pro:** all tiering is enforced by Virlo server-side. The plugin never gates — it just relays what the API allows for the user's key.

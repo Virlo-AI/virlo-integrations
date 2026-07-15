@@ -81,12 +81,14 @@ export async function virloFetch(
 
 /**
  * Poll an agent until finalized: true.
- * Checks every `intervalMs` (default 60s), up to `maxWaitMs` (default 30 min).
+ * Checks every `intervalMs` (default 60s), up to `maxWaitMs` (default 45 min).
+ * Broad runs with meta_ads_enabled can take up to ~45 min, so keep the cap
+ * generous — a slow run is not a failure.
  */
 export async function pollUntilFinalized(
   agentId: string,
   intervalMs = 60_000,
-  maxWaitMs = 30 * 60_000,
+  maxWaitMs = 45 * 60_000,
 ): Promise<Record<string, unknown>> {
   const start = Date.now();
   while (Date.now() - start < maxWaitMs) {
