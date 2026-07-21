@@ -57,7 +57,7 @@ curl -s "https://api.virlo.ai/v1/trends/emerging?region=gb" \
 
 ## Billing (so you can be transparent)
 
-Pay-as-you-go prepaid balance. 1 credit = $0.01. Reading results is **free**; creating research costs credits. Every billable response carries `x-cost` (dollars charged) and `x-credits-used` (credits consumed) headers. The `x-balance-remaining` / `x-credits-remaining` headers appear only when the account's live balance is resolvable on that request, so **do not depend on them** — to reliably check the balance, call the free `GET /v1/account/balance` endpoint.
+Pay-as-you-go prepaid balance. 1 credit = $0.01. Reading results is **free**; creating research costs credits. Every response carries `x-cost` (dollars charged) and `x-credits-used` (credits consumed) headers — `"0.00"` / `0` on free reads. The `x-balance-remaining` / `x-credits-remaining` headers appear **only on charged responses** (cost > 0), so **do not depend on them** — to reliably check the balance, call the free `GET /v1/account/balance` endpoint.
 
 | Action | Cost |
 | --- | --- |
@@ -149,7 +149,7 @@ Route on user intent: "what's trending today?" -> `digest`; "what's about to tak
 
 Deep research is asynchronous. **Never hardcode a timeout.**
 
-- **Content Research Agents (one-shot & recurring):** poll `GET /v1/agents/:id` every ~60s until `finalized: true`. Typical: **~15-20 min** (up to 45 with `meta_ads_enabled`). Status flow: `queued -> processing -> completed | partial_failure | failed`. Treat `partial_failure` as usable data (one platform failed, the rest succeeded). Only `failed` (<1%) means no data.
+- **Content Research Agents (one-shot & recurring):** poll `GET /v1/agents/:id` every ~60s until `finalized: true`. Typical: **~15-20 min** (up to 45 with `meta_ads_enabled`). Status flow: `pending -> processing -> completed | partial_failure | failed`. Treat `partial_failure` as usable data (one platform failed, the rest succeeded). Only `failed` (<1%) means no data.
 - **Satellite / video outlier:** poll every 10-15s; ~20-60s typical (sound lookups ~8 min - poll every 30s).
 - **`finalized: true` is the only real "done" signal.** While `finalized: false`, some fields (analysis, intelligence) may be `null` simply because their secondary job is still running - that is *not* "no data". Check `pending_jobs[]` for what's still in flight and each entry's `webhook_event` / `poll_url`.
 
@@ -168,12 +168,14 @@ The single most important rule: **rank by weighted virality score, never by raw 
 
 ## Error handling
 
-- **400** invalid params - check required fields.
-- **401** invalid key - must start with `virlo_tkn_`.
-- **402** insufficient balance - point to https://dev.virlo.ai/dashboard/billing.
-- **404** not found - verify the agent id / job id.
-- **429** rate limit - respect `Retry-After`; this is a rate limit, not a credit issue.
-- **500** - retry with backoff (5s, 10s, 20s).
+Every error body carries a **stable machine-readable `code`** alongside `statusCode`/`error`/`message`. Branch on `code`, never on `message` (human-facing, may be reworded).
+
+- **400** `validation_error` (also `invalid_date_range`, `unknown_region`) - check required fields and constraints.
+- **401** `missing_api_key` / `invalid_api_key` - key must start with `virlo_tkn_`.
+- **402** `insufficient_credits` - compare `required_credits` vs `remaining_credits`; point to https://dev.virlo.ai/dashboard/billing. Retrying cannot succeed.
+- **404** `not_found` - verify the agent id / job id (another team's resource also reports not-found by design).
+- **429** `rate_limit_exceeded` - respect `Retry-After`; this is a rate limit, not a credit issue. Not billed.
+- **5xx** `upstream_error` / `service_unavailable` / `internal_error` - retry with backoff (5s, 10s, 20s). Never billed.
 
 ## Reference
 

@@ -96,7 +96,10 @@ export async function pollUntilFinalized(
     if (agent.finalized === true) {
       return agent;
     }
-    console.error(`Agent ${agentId} status: ${agent.status} (waiting ${intervalMs / 1000}s)...`);
+    // The agent detail has no top-level `status`; the run status lives on latest_run.
+    const runStatus =
+      (agent.latest_run as Record<string, unknown> | null)?.status ?? "pending";
+    console.error(`Agent ${agentId} run status: ${runStatus} (waiting ${intervalMs / 1000}s)...`);
     await sleep(intervalMs);
   }
   throw new Error(`Agent ${agentId} did not finalize within ${maxWaitMs / 1000}s`);
@@ -105,6 +108,9 @@ export async function pollUntilFinalized(
 /**
  * Poll a Satellite job until complete.
  * Checks every `intervalMs` (default 15s), up to `maxWaitMs` (default 5 min).
+ * The defaults suit creator lookups and video outliers (20-60s typical).
+ * Sound lookups average ~8 min (plan for up to 20) — for those pass
+ * `intervalMs = 30_000, maxWaitMs = 20 * 60_000`.
  */
 export async function pollSatelliteJob(
   statusPath: string,
@@ -114,7 +120,7 @@ export async function pollSatelliteJob(
   const start = Date.now();
   while (Date.now() - start < maxWaitMs) {
     const job = await virloFetch(statusPath) as Record<string, unknown>;
-    if (job.status === "completed" || job.status === "done") {
+    if (job.status === "completed") {
       return job;
     }
     if (job.status === "failed") {
