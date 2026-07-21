@@ -1,87 +1,77 @@
-# Results Viewer (render-results.ts)
+# Results Viewer
 
-The `render-results.ts` script generates a standalone, self-contained HTML file from any finalized Virlo Content Research Agent. It's the standard way to present results visually instead of dumping raw JSON.
+The plugin ships a pre-built app and route for browsing Virlo agent results interactively, instead of dumping raw JSON.
 
-## Quick start
+## Architecture
 
-```bash
-# After an agent finalizes:
-bun {baseDir}/scripts/render-results.ts --agent-id <uuid>
-
-# With options:
-bun {baseDir}/scripts/render-results.ts --agent-id <uuid> --output ~/results.html --title "Fitness TikTok Research"
+```
+apps/results-viewer/index.html   (single-file app — UI rendered in workspace panel)
+routes/results.ts                (HTTP route — proxies Virlo API, returns combined JSON)
 ```
 
-## What it does
+The app is a single-file HTML app (inline CSS/JS allowed under the plugin CSP). It fetches data from the plugin's route, which resolves the Virlo API key from the credential store and calls all four result endpoints in parallel.
 
-1. Fetches all result endpoints in parallel (all free reads — no credit cost):
-   - `GET /v1/agents/:id` — agent metadata (keywords, intent, created date)
-   - `GET /v1/agents/:id/videos?order_by=views&sort=desc&limit=50` — top 50 videos
-   - `GET /v1/agents/:id/creators/outliers?order_by=weighted_score&limit=20` — top 20 outlier creators
-   - `GET /v1/agents/:id/hashtags?limit=50` — top 50 hashtags by views
-   - `GET /v1/agents/:id/sounds?sort=rising&limit=30` — top 30 rising sounds
+## The route — `routes/results.ts`
 
-2. Generates a single HTML file with all CSS/JS inline (no CDN, no external deps).
+Served at: `GET /x/plugins/virlo/results?agent_id=<uuid>`
 
-3. Writes the file to disk. Prints the path to stdout (for piping), logs a human-readable summary to stderr.
+Calls these Virlo endpoints in one parallel batch (all free reads):
 
-## CLI flags
+| Endpoint | Data |
+| --- | --- |
+| `GET /v1/agents/:id` | Agent metadata (keywords, intent, created_at) |
+| `GET /v1/agents/:id/videos?order_by=views&sort=desc&limit=50` | Top 50 videos by views |
+| `GET /v1/agents/:id/creators/outliers?order_by=weighted_score&limit=20` | Top 20 creator outliers |
+| `GET /v1/agents/:id/hashtags?limit=50` | Top 50 hashtags |
+| `GET /v1/agents/:id/sounds?sort=rising&limit=30` | Top 30 rising sounds |
 
-| Flag | Required | Description |
-|------|----------|-------------|
-| `--agent-id <uuid>` | Yes | The finalized agent ID |
-| `--output <path>` | No | Output file path. Defaults to `virlo-results-<first8>.html` in cwd |
-| `--title <string>` | No | HTML page title + header. Defaults to "Virlo Research — <first 3 keywords>" |
+Returns a single JSON payload:
 
-## The UI
+```json
+{
+  "agent": { ... },
+  "videos": [ ... ],
+  "outliers": [ ... ],
+  "hashtags": [ ... ],
+  "sounds": [ ... ]
+}
+```
 
-Dark editorial aesthetic matching Vellum's design language. Four tabs:
+Error responses:
+- `400` — missing `agent_id` query parameter
+- `401` — no Virlo API key in credential store, or invalid key
+- `402` — insufficient Virlo balance
+- `500` — Virlo API error or other failure
 
-### Top Videos
-- Card grid, auto-filling `minmax(300px, 1fr)` columns
-- Each card: thumbnail (16:10), platform badge, rank badge, description (3-line clamp), creator with avatar + follower count, stats (views/likes/shares/bookmarks), format tags from Virlo's AI intelligence layer
-- Every card is a clickable `<a>` linking to the original video URL
-- Stats bar: total videos, top views, TikTok count, Instagram count
+## The app — `apps/results-viewer/index.html`
 
-### Creator Outliers
-- Card grid, `minmax(360px, 1fr)` columns
-- Each card: avatar, handle, follower count, posts/week, 4-stat grid (avg views, top video, outlier ratio, breakout count), content angle quote box, topic tags (matching topics highlighted in accent green)
-- Every card links to the creator's profile URL
+App ID: `plugins~virlo~results-viewer`
 
-### Hashtags
-- Vertical list with bar chart visualization
-- Each row: hashtag name (accent green), proportional bar fill, view count
-- Sorted by total views descending
+### How it works
 
-### Rising Sounds
-- Card grid, `minmax(250px, 1fr)` columns
-- Each card: music note icon, sound name, platform tag
+1. On load, checks `window.location.search` for an `agent_id` query parameter. If present, auto-fetches results.
+2. If no `agent_id` in the URL, shows an input screen where the user can paste an agent UUID and click "Load Results" (or press Enter).
+3. Fetches `GET /x/plugins/virlo/results?agent_id=<uuid>` and renders the response.
 
-## Output format
+### UI — four tabs
 
-The HTML file is completely self-contained:
-- All CSS is inline in a `<style>` tag
-- All JS is inline in a `<script>` tag (just tab switching)
-- Image URLs (thumbnails, avatars) point to Virlo's CDN (`auth.virlo.ai/storage/...`)
-- No fonts loaded — uses system font stack (`-apple-system, DM Sans, system-ui`)
-- Works offline once loaded (images need network)
+1. **Top Videos** — responsive card grid. Each card shows thumbnail, platform badge, rank, description (truncated), creator handle + follower count, view/like/share/bookmark stats, and Virlo's AI-classified format/topic tags. Every card links to the original video.
+2. **Creator Outliers** — cards for rising small creators. Shows avatar, handle, platform, follower count, posting frequency, four stat tiles (avg views, top video, outlier ratio, breakout count), content angle, and topic tags (matching topics highlighted). Every card links to the creator's profile.
+3. **Hashtags** — ranked list with animated bar chart visualization. Each row shows the hashtag, a proportional bar, and total views.
+4. **Rising Sounds** — grid of trending audio tracks with platform label.
 
-## Design tokens
+### Design
 
-The viewer uses CSS custom properties for theming:
-- `--bg: #0a0a0b` — page background
-- `--surface: #141416` — card background
-- `--accent: #34d399` — emerald green (Vellum brand-adjacent)
-- `--text: #e4e4e7` — primary text
-- Fully responsive: collapses to single-column on mobile (≤600px)
+Dark editorial aesthetic. CSS custom properties for all colors, radii, and spacing. Fully responsive — single-column layout at 600px. No external dependencies, no CDN imports, no build step.
 
-## Integration with the assistant workflow
+## Integration workflow
 
-The SKILL.md instructs the assistant to run this script after any agent finalizes. The typical flow:
+1. Assistant runs a Content Research Agent (one-shot or recurring).
+2. Agent finalizes (`finalized: true`).
+3. Assistant opens the results-viewer app: `plugins~virlo~results-viewer`.
+4. If query params are supported, pass `agent_id=<uuid>` for auto-load. Otherwise the user enters the agent ID manually.
+5. The app fetches all results from the route and renders the interactive UI.
 
-1. Create agent → poll until finalized (~15-20 min)
-2. Run `render-results.ts --agent-id <uuid>`
-3. Open the HTML file for the user (or share the path)
-4. Provide a written summary of key findings alongside the viewer
+## Adding the app to the plugin
 
-The viewer is the browseable detail; the assistant's summary is the interpretation layer on top.
+The app and route are part of the plugin's source tree. They arrive on install, update on upgrade, and are removed on uninstall — no manual setup needed. The route resolves the API key from the credential store at request time, same as the plugin's scripts.

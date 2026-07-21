@@ -40,7 +40,6 @@ Runnable scripts are in `scripts/` alongside this skill. They handle credential 
 - `scripts/whats-viral.ts` - One-shot niche search (Content Research Agent). Kicks off, polls until finalized, reads all results.
 - `scripts/recurring-monitor.ts` - Create a recurring monitor agent.
 - `scripts/creator-deep-dive.ts` - Satellite creator lookup with optional video outlier analysis.
-- `scripts/render-results.ts` - Generate a standalone HTML results viewer from any agent ID. Fetches all result endpoints (free) and emits a self-contained dark-editorial HTML file with tabbed navigation: video card grid (thumbnails, stats, format tags), creator outlier cards, hashtag bar chart, and rising sounds. No external dependencies.
 - `scripts/virlo-client.ts` - Shared helper (credential resolution, fetch wrapper, polling). Import from other scripts.
 
 Run with `bun`:
@@ -158,20 +157,18 @@ Deep research is asynchronous. **Never hardcode a timeout.**
 
 ## Presenting results
 
-When an agent finalizes, generate a visual HTML viewer so the user can browse results interactively — don't dump raw JSON.
+When an agent finalizes, open the results-viewer app so the user can browse results interactively — don't dump raw JSON.
 
-```bash
-bun {baseDir}/scripts/render-results.ts --agent-id <uuid> --title "My Niche Research"
-```
-
-This fetches all result endpoints (free reads) and emits a self-contained HTML file with four tabs:
+The app ships with this plugin at `apps/results-viewer/`. It calls the plugin's `/x/plugins/virlo/results` route (which fetches all result endpoints — free reads — and returns them as a single JSON payload) and renders a four-tab interface:
 
 - **Top Videos** — card grid with thumbnails, platform badges, rank, creator info, view/like/share stats, and Virlo's AI-classified format tags. Every card links to the original video.
 - **Creator Outliers** — rising small creators with outlier ratio, breakout count, content angle, and topic tags. Every card links to the creator's profile.
 - **Hashtags** — ranked by total views with bar chart visualization.
 - **Rising Sounds** — trending audio tracks with platform.
 
-The file is fully self-contained (all CSS/JS inline, no CDN). Open it directly in a browser or share it. Pass `--output` to control the filename, `--title` to set the page title.
+Open the app with the app id `plugins~virlo~results-viewer`. If the app surface supports query parameters, pass `agent_id=<uuid>` so the app auto-loads results on open. Otherwise, tell the user to paste the agent ID into the app's input field.
+
+Full documentation: `references/results-viewer.md`.
 
 ## Interpreting results
 
@@ -196,7 +193,7 @@ The single most important rule: **rank by weighted virality score, never by raw 
 ## Reference
 
 - `references/agent-playbook.md` - how to interpret Virlo results (weighted score, formats, trends)
-- `references/results-viewer.md` - documentation for the HTML results viewer (render-results.ts)
+- `references/results-viewer.md` - documentation for the results-viewer app and results route
 - `references/golden-prompts.md` - acceptance criteria prompts the plugin must handle well
 - `references/` - worked end-to-end flow documentation
 - `scripts/` - runnable TypeScript scripts for each flow
