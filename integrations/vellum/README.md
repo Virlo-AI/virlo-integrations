@@ -41,6 +41,11 @@ integrations/vellum/
   hooks/
     init.ts                 Logs plugin registration (no config/env state)
     shutdown.ts             No-op (no state to clean up)
+  routes/
+    results.ts             HTTP route: aggregates all agent result endpoints into one JSON payload
+  apps/
+    results-viewer/        Multi-file React app for browsing agent results (ID plugins~virlo~results-viewer)
+      src/                 TSX source (index.html, App, components/, lib/) — compiled to dist/ by the bundler
   skills/
     virlo/
       SKILL.md              The assistant skill: how to use Virlo's API
