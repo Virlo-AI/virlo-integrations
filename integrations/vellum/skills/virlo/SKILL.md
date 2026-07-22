@@ -157,15 +157,19 @@ Deep research is asynchronous. **Never hardcode a timeout.**
 
 ## Presenting results — ALWAYS open the results-viewer app
 
-**When an agent finalizes or you retrieve any Virlo agent results, you MUST open the results-viewer app to show the user the data visually.** NEVER present results as raw JSON or a plain text dump. NEVER build a new app or generate HTML — the app ships with this plugin and is ready to use.
+**When an agent finalizes or you retrieve any Virlo agent results, you MUST open the results-viewer app to show the user the data visually.** NEVER present results as raw JSON or a plain text dump. NEVER build a new app, create one, or generate HTML — the app ships with this plugin and is ready to use.
 
 ### How to open it
 
+The app ID is `plugins~virlo~results-viewer`. Use this exact ID — do not search for it.
+
 1. Load the app-builder skill: `skill_load("app-builder")`
 2. Open the app: `app_open(app_id: "plugins~virlo~results-viewer")`
-3. Tell the user the app is open and they can browse results there
+3. Tell the user the app is open and they can paste their agent ID into it
 
-The app is pre-built and ships with the plugin. You do NOT need to create it, compile it, or build anything. Just open it.
+**Do NOT call `app_list` to find this app.** `app_list` only returns workspace apps the user built themselves. Plugin apps are NOT listed there — they are discovered automatically by the host when the plugin is installed. The app already exists and is registered. Just call `app_open` with the ID above.
+
+**Do NOT create, scaffold, or register the app.** It ships as source under `apps/results-viewer/src/` and compiles automatically on first open. The host handles discovery, compilation, and serving. You only need to open it.
 
 ### How the app works
 

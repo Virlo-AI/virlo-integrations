@@ -1,17 +1,16 @@
 /**
  * init hook - fires once when the plugin is registered (on boot or install).
  *
- * The Virlo plugin is a thin skill layer: the SKILL.md teaches the assistant
- * how to call Virlo's REST API, and the scripts under skills/virlo/scripts/
- * resolve the API key from the credential store at runtime via
- * `assistant credentials reveal --service virlo --field api_key`.
- *
- * This hook does not touch config or process environment. It only logs that
- * the plugin is loaded so daemon logs confirm successful registration.
+ * The Virlo plugin ships a pre-built results-viewer app alongside its skill
+ * and route. The app is automatically discovered by the host when the plugin
+ * is installed — no registration step needed. This hook logs the app ID so
+ * daemon logs confirm the app surface is available.
  */
 
 import type { InitContext } from "@vellumai/plugin-api";
 
 export default async function init(ctx: InitContext): Promise<void> {
   ctx.logger.info("Virlo plugin loaded - short-form social intelligence skill active");
+  ctx.logger.info("Virlo results-viewer app available - open with app_id: plugins~virlo~results-viewer");
+  ctx.logger.info("Virlo results route available at /x/plugins/virlo/results");
 }
