@@ -3,7 +3,7 @@
  *
  * Served at: /x/plugins/virlo/results?agent_id=<uuid>
  *
- * The results-viewer app calls this route to get videos, outliers, hashtags,
+ * The virlo-results-viewer app calls this route to get videos, outliers, hashtags,
  * and sounds in a single JSON payload. All Virlo result endpoints are free
  * reads (no credit cost), so this route is safe to call repeatedly.
  *

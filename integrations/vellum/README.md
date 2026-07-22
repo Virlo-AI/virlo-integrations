@@ -44,7 +44,7 @@ integrations/vellum/
   routes/
     results.ts             HTTP route: aggregates all agent result endpoints into one JSON payload
   apps/
-    results-viewer/        Multi-file React app for browsing agent results (ID plugins~virlo~results-viewer)
+    virlo-results-viewer/  Multi-file React app for browsing agent results (ID plugins~virlo~virlo-results-viewer)
       src/                 TSX source (index.html, App, components/, lib/) — compiled to dist/ by the bundler
   skills/
     virlo/

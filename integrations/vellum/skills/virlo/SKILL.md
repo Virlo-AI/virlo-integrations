@@ -61,7 +61,7 @@ Once an agent finalizes, don't dump raw JSON at the user - open the bundled
 **results viewer** app so they can browse videos, creator outliers, hashtags,
 and rising sounds interactively.
 
-- **App ID:** `plugins~virlo~results-viewer` (open this after a run finalizes).
+- **App ID:** `plugins~virlo~virlo-results-viewer` (open this after a run finalizes).
 - Pass `agent_id=<uuid>` as a query parameter to auto-load; otherwise the user
   pastes the agent UUID into the app's input field.
 - The app fetches everything from the plugin route `GET /x/plugins/virlo/results?agent_id=<uuid>`
@@ -69,8 +69,8 @@ and rising sounds interactively.
   aggregates all result endpoints into one JSON payload. All reads are free, so
   it's safe to refresh.
 
-The app is a multi-file React/TSX app under `apps/results-viewer/src/` (compiled
-to `dist/` by the bundler). Full details in `references/results-viewer.md`.
+The app is a multi-file React/TSX app under `apps/virlo-results-viewer/src/`
+(compiled to `dist/` by the bundler). Full details in `references/results-viewer.md`.
 
 ## Billing (so you can be transparent)
 
@@ -201,7 +201,7 @@ Every error body carries a **stable machine-readable `code`** alongside `statusC
 - `references/results-viewer.md` - the results viewer app + route (how to present results interactively)
 - `references/` - worked end-to-end flow documentation
 - `scripts/` - runnable TypeScript scripts for each flow
-- `apps/results-viewer/` - multi-file React app that renders agent results (app ID `plugins~virlo~results-viewer`)
+- `apps/virlo-results-viewer/` - multi-file React app that renders agent results (app ID `plugins~virlo~virlo-results-viewer`)
 - `routes/results.ts` - HTTP route the app calls to aggregate all result endpoints
 - Content Research Agents docs: https://dev.virlo.ai/docs/agents
 - Trends docs: https://dev.virlo.ai/docs/trends

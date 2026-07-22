@@ -1,7 +1,7 @@
 # Results Viewer app
 
 Interactive viewer for Virlo Content Research Agent results, rendered in the
-Vellum workspace panel. App ID: `plugins~virlo~results-viewer`.
+Vellum workspace panel. App ID: `plugins~virlo~virlo-results-viewer`.
 
 This is a multi-file React/TSX app, built the way Vellum's plugin app runtime
 expects (see https://www.vellum.ai/docs/extensibility/apps): TypeScript/TSX
@@ -11,7 +11,7 @@ ordinary React and mapped to `preact/compat` internally by the bundler, so no
 runtime dependency is declared here.
 
 ```
-apps/results-viewer/
+apps/virlo-results-viewer/
   src/
     index.html            HTML entry — loads the bundled main.js / main.css
     main.tsx              React root render + stylesheet import
