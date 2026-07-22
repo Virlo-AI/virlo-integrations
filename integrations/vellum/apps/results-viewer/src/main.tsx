@@ -39,6 +39,7 @@ function App() {
   const [agentId, setAgentId] = useState("");
   const [showInput, setShowInput] = useState(true);
   const [activeTab, setActiveTab] = useState("videos");
+  const [checking, setChecking] = useState(true);
 
   const loadResults = useCallback(async (id: string) => {
     setShowInput(false);
@@ -59,15 +60,40 @@ function App() {
     }
   }, []);
 
-  // Auto-load from URL param
+  // Auto-load: check URL param first, then check for pending agent_id staged by assistant
   useEffect(() => {
+    // 1. URL param (direct link with ?agent_id=...)
     const params = new URLSearchParams(window.location.search);
-    const id = params.get("agent_id");
-    if (id) {
-      setAgentId(id);
-      loadResults(id);
+    const urlId = params.get("agent_id");
+    if (urlId) {
+      setAgentId(urlId);
+      setChecking(false);
+      loadResults(urlId);
+      return;
     }
+    // 2. Pending check — assistant POSTs agent_id to route before opening app
+    fetch("/x/plugins/virlo/results?pending=1")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { agent_id?: string | null } | null) => {
+        if (data?.agent_id) {
+          setAgentId(data.agent_id);
+          setChecking(false);
+          loadResults(data.agent_id);
+        } else {
+          setChecking(false);
+        }
+      })
+      .catch(() => setChecking(false));
   }, [loadResults]);
+
+  if (checking) {
+    return (
+      <div className="loading">
+        <div className="spinner" />
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   if (showInput && !data && !loading) {
     return (
@@ -108,7 +134,7 @@ function App() {
       <div className="error-screen">
         <h3>Failed to load</h3>
         <p>{error}</p>
-        <button onClick={() => { setShowInput(true); setError(null); setData(null); }}>
+        <button onClick={() => { setShowInput(true); setError(null); setData(null); setChecking(false); }}>
           Try Again
         </button>
       </div>

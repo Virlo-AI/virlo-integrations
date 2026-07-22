@@ -159,21 +159,33 @@ Deep research is asynchronous. **Never hardcode a timeout.**
 
 **When an agent finalizes or you retrieve any Virlo agent results, you MUST open the results-viewer app to show the user the data visually.** NEVER present results as raw JSON or a plain text dump. NEVER build a new app, create one, or generate HTML — the app ships with this plugin and is ready to use.
 
-### How to open it
+### How to open it (auto-load flow)
 
 The app ID is `plugins~virlo~results-viewer`. Use this exact ID — do not search for it.
 
+**Step 1: Stage the agent ID** — POST the agent ID to the plugin route so the app can auto-load results on open (no user paste needed):
+
+```bash
+curl -s -X POST "http://localhost:$(cat ~/.vellum/server.port)/x/plugins/virlo/results" \
+  -H "Content-Type: application/json" \
+  -d '{"agent_id": "<the-agent-uuid>"}'
+```
+
+**Step 2: Open the app** — the app checks for the staged agent ID on mount and auto-fetches results:
+
 1. Load the app-builder skill: `skill_load("app-builder")`
 2. Open the app: `app_open(app_id: "plugins~virlo~results-viewer")`
-3. Tell the user the app is open and they can paste their agent ID into it
+3. Tell the user the results are loaded and ready to browse
 
 **Do NOT call `app_list` to find this app.** `app_list` only returns workspace apps the user built themselves. Plugin apps are NOT listed there — they are discovered automatically by the host when the plugin is installed. The app already exists and is registered. Just call `app_open` with the ID above.
 
 **Do NOT create, scaffold, or register the app.** It ships as source under `apps/results-viewer/src/` and compiles automatically on first open. The host handles discovery, compilation, and serving. You only need to open it.
 
+**Do NOT skip the POST.** Without it, the app opens to a blank input screen and the user has to paste the agent ID manually. The POST stages the ID in memory so the app auto-loads results immediately.
+
 ### How the app works
 
-The app has an input field where the user pastes the agent ID. It fetches data from the plugin's route at `/x/plugins/virlo/results?agent_id=<uuid>`, which calls all four Virlo result endpoints in parallel (all free reads) and returns combined JSON.
+The app checks for a staged agent ID on mount (set by the POST above), then fetches data from the plugin's route at `/x/plugins/virlo/results?agent_id=<uuid>`, which calls all four Virlo result endpoints in parallel (all free reads) and returns combined JSON. If no staged ID is found, it falls back to a manual input field.
 
 Four tabs in a dark editorial UI:
 

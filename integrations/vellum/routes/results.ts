@@ -1,7 +1,11 @@
 /**
  * routes/results.ts — HTTP endpoint that fetches all Virlo agent results in one call.
  *
- * Served at: /x/plugins/virlo/results?agent_id=<uuid>
+ * Served at: /x/plugins/virlo/results
+ *
+ * GET  /x/plugins/virlo/results?agent_id=<uuid>  — fetch all results for an agent
+ * GET  /x/plugins/virlo/results?pending=1        — check for a pending agent ID (set by POST)
+ * POST /x/plugins/virlo/results  { agent_id }    — stage an agent ID for auto-load in the app
  *
  * The results-viewer app calls this route to get videos, outliers, hashtags,
  * and sounds in a single JSON payload. All Virlo result endpoints are free
@@ -14,6 +18,10 @@
 import { execSync } from "node:child_process";
 
 const BASE_URL = "https://api.virlo.ai/v1";
+
+// In-memory staging area: the assistant POSTs an agent_id here before opening
+// the app, so the app can auto-load results on mount without the user pasting anything.
+let pendingAgentId: string | null = null;
 
 function getApiKey(): string {
   try {
@@ -69,7 +77,11 @@ export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const agentId = url.searchParams.get("agent_id");
 
+  // Pending check: app calls this on mount to see if the assistant staged an agent_id
   if (!agentId) {
+    if (url.searchParams.get("pending") === "1") {
+      return Response.json({ agent_id: pendingAgentId });
+    }
     return Response.json(
       { error: "Missing agent_id query parameter" },
       { status: 400 },
@@ -109,5 +121,33 @@ export async function GET(request: Request): Promise<Response> {
         ? 402
         : 500;
     return Response.json({ error: message }, { status });
+  }
+}
+
+/**
+ * POST /x/plugins/virlo/results
+ * Body: { "agent_id": "<uuid>" }
+ *
+ * Stages an agent ID so the results-viewer app can auto-load on mount.
+ * The assistant calls this right before opening the app, eliminating the
+ * need for the user to paste an ID manually.
+ */
+export async function POST(request: Request): Promise<Response> {
+  try {
+    const body = (await request.json()) as { agent_id?: string };
+    const id = body?.agent_id;
+    if (!id || typeof id !== "string") {
+      return Response.json(
+        { error: "Missing agent_id in request body" },
+        { status: 400 },
+      );
+    }
+    pendingAgentId = id;
+    return Response.json({ ok: true, agent_id: id });
+  } catch {
+    return Response.json(
+      { error: "Invalid JSON body — expected { \"agent_id\": \"<uuid>\" }" },
+      { status: 400 },
+    );
   }
 }
