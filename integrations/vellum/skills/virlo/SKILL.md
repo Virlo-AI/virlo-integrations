@@ -155,6 +155,31 @@ Deep research is asynchronous. **Never hardcode a timeout.**
 
 **Vellum is always-on, so lean into it.** When you start an agent run, tell the user plainly: *"Kicked off - this takes about 15-20 minutes. I'll surface the results as soon as it's finalized."* Then either poll in the background or subscribe to `content_research_agent.run.completed` and notify them when it lands. Don't make the user sit and wait synchronously.
 
+## Presenting results — ALWAYS open the results-viewer app
+
+**When an agent finalizes or you retrieve any Virlo agent results, you MUST open the results-viewer app to show the user the data visually.** NEVER present results as raw JSON or a plain text dump. NEVER build a new app or generate HTML — the app ships with this plugin and is ready to use.
+
+### How to open it
+
+1. Load the app-builder skill: `skill_load("app-builder")`
+2. Open the app: `app_open(app_id: "plugins~virlo~results-viewer")`
+3. Tell the user the app is open and they can browse results there
+
+The app is pre-built and ships with the plugin. You do NOT need to create it, compile it, or build anything. Just open it.
+
+### How the app works
+
+The app has an input field where the user pastes the agent ID. It fetches data from the plugin's route at `/x/plugins/virlo/results?agent_id=<uuid>`, which calls all four Virlo result endpoints in parallel (all free reads) and returns combined JSON.
+
+Four tabs in a dark editorial UI:
+
+- **Top Videos** — card grid with thumbnails, platform badges, rank, creator info, view/like/share stats, and Virlo's AI-classified format tags. Every card links to the original video.
+- **Creator Outliers** — rising small creators with outlier ratio, breakout count, content angle, and topic tags. Every card links to the creator's profile.
+- **Hashtags** — ranked by total views with bar chart visualization.
+- **Rising Sounds** — trending audio tracks with platform.
+
+Full documentation: `references/results-viewer.md`.
+
 ## Interpreting results
 
 The single most important rule: **rank by weighted virality score, never by raw views.** Full guidance is in `references/agent-playbook.md` (bundled alongside this skill) and at https://dev.virlo.ai/agent-playbook.txt. Essentials:
@@ -180,6 +205,7 @@ Every error body carries a **stable machine-readable `code`** alongside `statusC
 ## Reference
 
 - `references/agent-playbook.md` - how to interpret Virlo results (weighted score, formats, trends)
+- `references/results-viewer.md` - documentation for the results-viewer app and results route
 - `references/golden-prompts.md` - acceptance criteria prompts the plugin must handle well
 - `references/` - worked end-to-end flow documentation
 - `scripts/` - runnable TypeScript scripts for each flow
