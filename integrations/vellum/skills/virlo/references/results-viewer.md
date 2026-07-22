@@ -24,8 +24,10 @@ An interactive panel with four tabs:
    This kicks off a Content Research Agent, which takes ~15-20 minutes.
 2. When the run finishes, the assistant opens the Results Viewer for that agent —
    the user doesn't need to do anything.
-3. To reopen results later, the user can open the app and paste the agent's ID,
-   or the assistant can reopen it for them.
+3. To browse results later, the user opens the app and sees a list of **their
+   Virlo agents** — each showing its keywords, platforms, whether it's recurring,
+   and when it was created. Clicking one opens its results. (There's also a
+   manual "enter an agent ID" option for anyone who has an ID to hand.)
 
 ## Answering common questions
 
@@ -33,7 +35,7 @@ An interactive panel with four tabs:
   automatically once a run finalizes; results can be reopened any time.
 - **"Does viewing results cost anything?"** — No. Browsing and refreshing
   results is always free; only starting new research costs credits.
-- **"Can I open an old search?"** — Yes. Every agent keeps its results, so the
-  viewer can be reopened for any past agent by its ID.
+- **"Can I open an old search?"** — Yes. The viewer lists all of the user's
+  agents; they can pick any past agent to reopen its results.
 - **"Where does the data come from?"** — It's the live output of the user's own
   Content Research Agent, pulled straight from Virlo.

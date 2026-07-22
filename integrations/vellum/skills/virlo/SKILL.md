@@ -62,9 +62,11 @@ Once an agent finalizes, don't dump raw JSON at the user - open the bundled
 and rising sounds interactively.
 
 - **App ID:** `plugins~virlo~virlo-results-viewer` (open this after a run finalizes).
-- Pass `agent_id=<uuid>` as a query parameter to auto-load; otherwise the user
-  pastes the agent UUID into the app's input field.
-- The app fetches everything from the plugin route `GET /x/plugins/virlo/results?agent_id=<uuid>`
+- Pass `agent_id=<uuid>` as a query parameter to jump straight to that agent's
+  results. With no query parameter, the app lists the user's agents (via
+  `GET /x/plugins/virlo/agents`, backed by `routes/agents.ts`) so they can click
+  one instead of pasting a UUID; a manual-entry fallback is still available.
+- The app fetches results from the plugin route `GET /x/plugins/virlo/results?agent_id=<uuid>`
   (`routes/results.ts`), which resolves the API key from the credential store and
   aggregates all result endpoints into one JSON payload. All reads are free, so
   it's safe to refresh.
@@ -203,6 +205,7 @@ Every error body carries a **stable machine-readable `code`** alongside `statusC
 - `scripts/` - runnable TypeScript scripts for each flow
 - `apps/virlo-results-viewer/` - multi-file React app that renders agent results (app ID `plugins~virlo~virlo-results-viewer`)
 - `routes/results.ts` - HTTP route the app calls to aggregate all result endpoints
+- `routes/agents.ts` - HTTP route the app calls to list the user's agents for the picker
 - Content Research Agents docs: https://dev.virlo.ai/docs/agents
 - Trends docs: https://dev.virlo.ai/docs/trends
 - Full API reference (all endpoints): https://dev.virlo.ai/llms-full.txt

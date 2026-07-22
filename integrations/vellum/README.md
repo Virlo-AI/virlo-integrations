@@ -43,6 +43,7 @@ integrations/vellum/
     shutdown.ts             No-op (no state to clean up)
   routes/
     results.ts             HTTP route: aggregates all agent result endpoints into one JSON payload
+    agents.ts              HTTP route: lists the user's agents for the viewer's picker
   apps/
     virlo-results-viewer/  Multi-file React app for browsing agent results (ID plugins~virlo~virlo-results-viewer)
       src/                 TSX source (index.html, App, components/, lib/) — compiled to dist/ by the bundler

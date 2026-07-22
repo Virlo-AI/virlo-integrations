@@ -75,3 +75,23 @@ export interface ResultsData {
 }
 
 export type TabKey = "videos" | "outliers" | "hashtags" | "sounds";
+
+/** One entry in the list returned by `/x/plugins/virlo/agents`. */
+export interface AgentSummary {
+  id?: string;
+  agent_id?: string;
+  name?: string;
+  intent?: string;
+  keywords?: string[];
+  platforms?: string[];
+  is_recurring?: boolean;
+  cadence?: string;
+  status?: string;
+  finalized?: boolean;
+  created_at?: string;
+}
+
+/** Best available id for an agent, tolerating either field name. */
+export function agentId(a: AgentSummary): string {
+  return a.id || a.agent_id || "";
+}

@@ -1,4 +1,18 @@
-import type { ResultsData } from "../types";
+import type { AgentSummary, ResultsData } from "../types";
+
+/**
+ * List the user's Virlo agents via the plugin route, so the picker can show
+ * them as clickable cards. Listing agents is a free read.
+ */
+export async function fetchAgents(): Promise<AgentSummary[]> {
+  const res = await fetch("/x/plugins/virlo/agents");
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(err.error || "HTTP " + res.status);
+  }
+  const data = (await res.json()) as { agents?: AgentSummary[] };
+  return data.agents || [];
+}
 
 /**
  * Fetch all agent results from the plugin route. The route resolves the Virlo

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import type { ResultsData } from "./types";
 import { fetchResults } from "./lib/api";
-import { InputScreen } from "./components/InputScreen";
+import { AgentList } from "./components/AgentList";
 import { Loading } from "./components/Loading";
 import { ErrorScreen } from "./components/ErrorScreen";
 import { ResultsView } from "./components/ResultsView";
 
 type View =
-  | { kind: "input" }
+  | { kind: "picker" }
   | { kind: "loading" }
   | { kind: "error"; message: string }
   | { kind: "results"; data: ResultsData };
@@ -17,7 +17,7 @@ const AGENT_ID_FROM_URL = new URLSearchParams(window.location.search).get(
 );
 
 export function App() {
-  const [view, setView] = useState<View>({ kind: "input" });
+  const [view, setView] = useState<View>({ kind: "picker" });
 
   const load = async (agentId: string) => {
     setView({ kind: "loading" });
@@ -48,15 +48,13 @@ export function App() {
       return (
         <ErrorScreen
           message={view.message}
-          onRetry={() => setView({ kind: "input" })}
+          onRetry={() => setView({ kind: "picker" })}
         />
       );
     case "results":
       return <ResultsView data={view.data} />;
-    case "input":
+    case "picker":
     default:
-      return (
-        <InputScreen initialValue={AGENT_ID_FROM_URL || ""} onLoad={load} />
-      );
+      return <AgentList onSelect={load} />;
   }
 }

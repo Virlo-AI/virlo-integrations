@@ -22,7 +22,8 @@ apps/virlo-results-viewer/
       api.ts              fetchResults() — calls the plugin route
       format.ts           fmt() compact number formatting
     components/
-      InputScreen.tsx     Paste-an-agent-UUID landing screen
+      AgentList.tsx       Lists the user's agents as clickable cards (landing screen)
+      InputScreen.tsx     Manual "paste an agent UUID" fallback
       Loading.tsx         Spinner while fetching
       ErrorScreen.tsx     Error state with retry
       ResultsView.tsx     Header + tab bar + active tab
@@ -36,10 +37,13 @@ apps/virlo-results-viewer/
 
 ## Data flow
 
-The app never touches the Virlo API directly. On load it reads an optional
-`?agent_id=<uuid>` query parameter (auto-loading if present), then fetches
-`GET /x/plugins/virlo/results?agent_id=<uuid>`. That route (`routes/results.ts`
-at the plugin root) resolves the Virlo API key from the credential store and
-aggregates all result endpoints — videos, creator outliers, hashtags, and
-rising sounds — into a single JSON payload, which this app renders across four
-tabs.
+The app never touches the Virlo API directly — it talks to two plugin routes
+(both at the plugin root), which resolve the Virlo API key from the credential
+store:
+
+- **`GET /x/plugins/virlo/agents`** (`routes/agents.ts`) — lists the user's
+  agents for the landing-screen picker. Skipped when the app is opened with an
+  `?agent_id=<uuid>` query parameter.
+- **`GET /x/plugins/virlo/results?agent_id=<uuid>`** (`routes/results.ts`) —
+  aggregates all result endpoints (videos, creator outliers, hashtags, rising
+  sounds) into a single JSON payload, which this app renders across four tabs.
