@@ -155,6 +155,21 @@ Deep research is asynchronous. **Never hardcode a timeout.**
 
 **Vellum is always-on, so lean into it.** When you start an agent run, tell the user plainly: *"Kicked off - this takes about 15-20 minutes. I'll surface the results as soon as it's finalized."* Then either poll in the background or subscribe to `content_research_agent.run.completed` and notify them when it lands. Don't make the user sit and wait synchronously.
 
+## Presenting results
+
+When an agent finalizes, open the results-viewer app so the user can browse results interactively — don't dump raw JSON.
+
+The app ships with this plugin at `apps/results-viewer/`. It calls the plugin's `/x/plugins/virlo/results` route (which fetches all result endpoints — free reads — and returns them as a single JSON payload) and renders a four-tab interface:
+
+- **Top Videos** — card grid with thumbnails, platform badges, rank, creator info, view/like/share stats, and Virlo's AI-classified format tags. Every card links to the original video.
+- **Creator Outliers** — rising small creators with outlier ratio, breakout count, content angle, and topic tags. Every card links to the creator's profile.
+- **Hashtags** — ranked by total views with bar chart visualization.
+- **Rising Sounds** — trending audio tracks with platform.
+
+Open the app with the app id `plugins~virlo~results-viewer`. If the app surface supports query parameters, pass `agent_id=<uuid>` so the app auto-loads results on open. Otherwise, tell the user to paste the agent ID into the app's input field.
+
+Full documentation: `references/results-viewer.md`.
+
 ## Interpreting results
 
 The single most important rule: **rank by weighted virality score, never by raw views.** Full guidance is in `references/agent-playbook.md` (bundled alongside this skill) and at https://dev.virlo.ai/agent-playbook.txt. Essentials:
@@ -180,6 +195,7 @@ Every error body carries a **stable machine-readable `code`** alongside `statusC
 ## Reference
 
 - `references/agent-playbook.md` - how to interpret Virlo results (weighted score, formats, trends)
+- `references/results-viewer.md` - documentation for the results-viewer app and results route
 - `references/golden-prompts.md` - acceptance criteria prompts the plugin must handle well
 - `references/` - worked end-to-end flow documentation
 - `scripts/` - runnable TypeScript scripts for each flow
