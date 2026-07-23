@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import type { ResultsData } from "./types";
-import { fetchResults } from "./lib/api";
+import { fetchResults, ApiKeyRequiredError } from "./lib/api";
 import { AgentList } from "./components/AgentList";
 import { Loading } from "./components/Loading";
 import { ErrorScreen } from "./components/ErrorScreen";
+import { ApiKeyScreen } from "./components/ApiKeyScreen";
 import { ResultsView } from "./components/ResultsView";
 
 type View =
   | { kind: "picker" }
   | { kind: "loading" }
   | { kind: "error"; message: string }
+  | { kind: "apikey"; message: string; agentId: string }
   | { kind: "results"; data: ResultsData };
 
 const AGENT_ID_FROM_URL = new URLSearchParams(window.location.search).get(
@@ -25,6 +27,10 @@ export function App() {
       const data = await fetchResults(agentId);
       setView({ kind: "results", data });
     } catch (err) {
+      if (err instanceof ApiKeyRequiredError) {
+        setView({ kind: "apikey", message: err.message, agentId });
+        return;
+      }
       setView({
         kind: "error",
         message:
@@ -49,6 +55,13 @@ export function App() {
         <ErrorScreen
           message={view.message}
           onRetry={() => setView({ kind: "picker" })}
+        />
+      );
+    case "apikey":
+      return (
+        <ApiKeyScreen
+          message={view.message}
+          onRetry={() => load(view.agentId)}
         />
       );
     case "results":

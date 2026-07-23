@@ -14,17 +14,22 @@ import { resolveCredential } from "@vellumai/plugin-api";
 
 export const BASE_URL = "https://api.virlo.ai/v1";
 
+/** Thrown when no Virlo API key is stored (or it resolves empty). Maps to 401. */
+export class MissingApiKeyError extends Error {}
+
 export async function getApiKey(): Promise<string> {
+  let key: string;
   try {
-    const key = (await resolveCredential("virlo/api_key")).trim();
-    if (!key) throw new Error("empty credential");
-    return key;
+    key = (await resolveCredential("virlo/api_key")).trim();
   } catch {
-    throw new Error(
-      "No Virlo API key found in the credential store. " +
-        "Store one with: assistant credentials set --service virlo --field api_key <your_key>",
+    key = "";
+  }
+  if (!key) {
+    throw new MissingApiKeyError(
+      "No Virlo API key is configured. Add one to load your Virlo data.",
     );
   }
+  return key;
 }
 
 export async function virloFetch(path: string, apiKey: string): Promise<unknown> {
@@ -61,13 +66,28 @@ export function extractList(data: unknown, ...keys: string[]): unknown[] {
   return [];
 }
 
-/** Map a thrown error message to the HTTP status a route should return. */
+/** Map a thrown error to the HTTP status + machine-readable code a route returns. */
 export function errorResponse(err: unknown): Response {
   const message = err instanceof Error ? err.message : "Unknown error";
-  const status = message.includes("No Virlo API key")
-    ? 401
-    : message.includes("Insufficient")
-      ? 402
-      : 500;
-  return Response.json({ error: message }, { status });
+  if (err instanceof MissingApiKeyError) {
+    return Response.json(
+      { error: message, code: "missing_api_key" },
+      { status: 401 },
+    );
+  }
+  // A 401 from Virlo means the stored key is present but rejected — same
+  // remedy for the user (fix the key), so surface it as 401 too.
+  if (message.includes("Invalid Virlo API key")) {
+    return Response.json(
+      { error: message, code: "invalid_api_key" },
+      { status: 401 },
+    );
+  }
+  if (message.includes("Insufficient")) {
+    return Response.json(
+      { error: message, code: "insufficient_balance" },
+      { status: 402 },
+    );
+  }
+  return Response.json({ error: message, code: "internal_error" }, { status: 500 });
 }

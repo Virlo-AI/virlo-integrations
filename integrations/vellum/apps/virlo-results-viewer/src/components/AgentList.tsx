@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import type { AgentSummary } from "../types";
 import { agentId } from "../types";
-import { fetchAgents } from "../lib/api";
+import { fetchAgents, ApiKeyRequiredError } from "../lib/api";
 import { InputScreen } from "./InputScreen";
+import { ApiKeyScreen } from "./ApiKeyScreen";
 
 interface Props {
   onSelect: (agentId: string) => void;
@@ -11,6 +12,7 @@ interface Props {
 type State =
   | { kind: "loading" }
   | { kind: "error"; message: string }
+  | { kind: "apikey"; message: string }
   | { kind: "list"; agents: AgentSummary[] };
 
 function agentTitle(a: AgentSummary): string {
@@ -59,18 +61,25 @@ export function AgentList({ onSelect }: Props) {
     setState({ kind: "loading" });
     fetchAgents()
       .then((agents) => setState({ kind: "list", agents }))
-      .catch((err) =>
+      .catch((err) => {
+        if (err instanceof ApiKeyRequiredError) {
+          setState({ kind: "apikey", message: err.message });
+          return;
+        }
         setState({
           kind: "error",
           message:
             err instanceof Error && err.message
               ? err.message
               : "Could not load your agents.",
-        }),
-      );
+        });
+      });
   };
 
   useEffect(load, []);
+
+  if (state.kind === "apikey")
+    return <ApiKeyScreen message={state.message} onRetry={load} />;
 
   if (manual)
     return (

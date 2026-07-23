@@ -24,6 +24,7 @@ apps/virlo-results-viewer/
     components/
       AgentList.tsx       Lists the user's agents as clickable cards (landing screen)
       InputScreen.tsx     Manual "paste an agent UUID" fallback
+      ApiKeyScreen.tsx    Shown on a 401 — guides the user to add a Virlo API key
       Loading.tsx         Spinner while fetching
       ErrorScreen.tsx     Error state with retry
       ResultsView.tsx     Header + tab bar + active tab

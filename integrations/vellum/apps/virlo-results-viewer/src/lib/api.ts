@@ -1,6 +1,19 @@
 import type { AgentSummary, ResultsData } from "../types";
 
 /**
+ * Thrown when the route reports that no usable Virlo API key is configured
+ * (HTTP 401). The app catches this to show the "add your API key" screen
+ * rather than a generic error.
+ */
+export class ApiKeyRequiredError extends Error {}
+
+/** Build the right Error for a failed response: ApiKeyRequiredError on 401. */
+async function toError(res: Response): Promise<Error> {
+  const message = await readError(res);
+  return res.status === 401 ? new ApiKeyRequiredError(message) : new Error(message);
+}
+
+/**
  * Pull a human-readable message out of an error response, whatever shape it
  * takes. Route errors are `{ error: "..." }`, but a platform 404 (or other
  * non-route failure) can return `{ error: { message } }`, `{ message }`, a
@@ -37,7 +50,7 @@ function messageFrom(body: unknown): string {
  */
 export async function fetchAgents(): Promise<AgentSummary[]> {
   const res = await window.vellum.fetch("/x/plugins/virlo/agents");
-  if (!res.ok) throw new Error(await readError(res));
+  if (!res.ok) throw await toError(res);
   const data = (await res.json()) as { agents?: AgentSummary[] };
   return data.agents || [];
 }
@@ -51,6 +64,6 @@ export async function fetchResults(agentId: string): Promise<ResultsData> {
   const res = await window.vellum.fetch(
     "/x/plugins/virlo/results?agent_id=" + encodeURIComponent(agentId),
   );
-  if (!res.ok) throw new Error(await readError(res));
+  if (!res.ok) throw await toError(res);
   return (await res.json()) as ResultsData;
 }

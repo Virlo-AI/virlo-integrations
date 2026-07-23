@@ -32,6 +32,20 @@ body{font-family:-apple-system,"DM Sans",system-ui,sans-serif;background:var(--b
 .agent-manual-toggle button{background:none;border:none;color:var(--text-m);font-size:12px;font-family:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:2px;transition:color .15s}
 .agent-manual-toggle button:hover{color:var(--text-2)}
 
+/* API key screen */
+.apikey-screen{max-width:460px;margin:0 auto;padding:max(48px,env(safe-area-inset-top)) 24px 60px;min-height:100vh;display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center}
+.apikey-icon{font-size:32px;margin-bottom:12px}
+.apikey-screen h1{font-size:22px;font-weight:700;letter-spacing:-0.02em;margin-bottom:8px}
+.apikey-screen p{font-size:13px;color:var(--text-m);margin-bottom:20px;line-height:1.6}
+.apikey-steps{list-style:none;counter-reset:step;display:flex;flex-direction:column;gap:12px;text-align:left;width:100%;margin-bottom:24px}
+.apikey-steps li{counter-increment:step;position:relative;padding:12px 14px 12px 42px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);font-size:13px;color:var(--text-2);line-height:1.5}
+.apikey-steps li::before{content:counter(step);position:absolute;left:12px;top:12px;width:20px;height:20px;border-radius:50%;background:var(--accent-d);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.apikey-steps a{color:var(--accent);text-decoration:none}.apikey-steps a:hover{text-decoration:underline}
+.apikey-steps code{font-size:12px;background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px;color:var(--text)}
+.apikey-quote{display:block;margin-top:6px;font-style:italic;color:var(--text);background:rgba(255,255,255,0.03);border-left:2px solid var(--accent);padding:8px 10px;border-radius:4px}
+.apikey-retry{padding:12px 24px;background:var(--accent);color:#0a0a0b;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.apikey-retry:hover{opacity:.85}
+
 /* Loading */
 .loading{text-align:center;padding:80px 20px;color:var(--text-m)}
 .loading .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
