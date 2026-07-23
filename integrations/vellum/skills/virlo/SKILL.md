@@ -55,6 +55,25 @@ curl -s "https://api.virlo.ai/v1/trends/emerging?region=gb" \
   -H "Authorization: Bearer $(assistant credentials reveal --service virlo --field api_key)"
 ```
 
+## Presenting results - the results viewer app
+
+Once an agent finalizes, don't dump raw JSON at the user - open the bundled
+**results viewer** app so they can browse videos, creator outliers, hashtags,
+and rising sounds interactively.
+
+- **App ID:** `plugins~virlo~virlo-results-viewer` (open this after a run finalizes).
+- Pass `agent_id=<uuid>` as a query parameter to jump straight to that agent's
+  results. With no query parameter, the app lists the user's agents (via
+  `GET /x/plugins/virlo/agents`, backed by `routes/agents.ts`) so they can click
+  one instead of pasting a UUID; a manual-entry fallback is still available.
+- The app fetches results from the plugin route `GET /x/plugins/virlo/results?agent_id=<uuid>`
+  (`routes/results.ts`), which resolves the API key from the credential store and
+  aggregates all result endpoints into one JSON payload. All reads are free, so
+  it's safe to refresh.
+
+The app is a multi-file React/TSX app under `apps/virlo-results-viewer/src/`
+(compiled to `dist/` by the bundler). Full details in `references/results-viewer.md`.
+
 ## Billing (so you can be transparent)
 
 Pay-as-you-go prepaid balance. 1 credit = $0.01. Reading results is **free**; creating research costs credits. Every response carries `x-cost` (dollars charged) and `x-credits-used` (credits consumed) headers — `"0.00"` / `0` on free reads. The `x-balance-remaining` / `x-credits-remaining` headers appear **only on charged responses** (cost > 0), so **do not depend on them** — to reliably check the balance, call the free `GET /v1/account/balance` endpoint.
@@ -181,8 +200,12 @@ Every error body carries a **stable machine-readable `code`** alongside `statusC
 
 - `references/agent-playbook.md` - how to interpret Virlo results (weighted score, formats, trends)
 - `references/golden-prompts.md` - acceptance criteria prompts the plugin must handle well
+- `references/results-viewer.md` - the results viewer app + route (how to present results interactively)
 - `references/` - worked end-to-end flow documentation
 - `scripts/` - runnable TypeScript scripts for each flow
+- `apps/virlo-results-viewer/` - multi-file React app that renders agent results (app ID `plugins~virlo~virlo-results-viewer`)
+- `routes/results.ts` - HTTP route the app calls to aggregate all result endpoints
+- `routes/agents.ts` - HTTP route the app calls to list the user's agents for the picker
 - Content Research Agents docs: https://dev.virlo.ai/docs/agents
 - Trends docs: https://dev.virlo.ai/docs/trends
 - Full API reference (all endpoints): https://dev.virlo.ai/llms-full.txt
