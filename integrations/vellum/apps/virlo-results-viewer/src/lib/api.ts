@@ -5,7 +5,7 @@ import type { AgentSummary, ResultsData } from "../types";
  * them as clickable cards. Listing agents is a free read.
  */
 export async function fetchAgents(): Promise<AgentSummary[]> {
-  const res = await fetch("/x/plugins/virlo/agents");
+  const res = await window.vellum.fetch("/x/plugins/virlo/agents");
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))) as { error?: string };
     throw new Error(err.error || "HTTP " + res.status);
@@ -20,7 +20,7 @@ export async function fetchAgents(): Promise<AgentSummary[]> {
  * a single JSON payload — so the app never touches the Virlo API directly.
  */
 export async function fetchResults(agentId: string): Promise<ResultsData> {
-  const res = await fetch(
+  const res = await window.vellum.fetch(
     "/x/plugins/virlo/results?agent_id=" + encodeURIComponent(agentId),
   );
   if (!res.ok) {
