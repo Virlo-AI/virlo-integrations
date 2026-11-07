@@ -30,7 +30,7 @@ Built on Virlo's forward-facing surfaces:
   - *one-shot* (`is_recurring: false`) - niche search: *"what's viral in London TikTok fitness right now?"*
   - *recurring* (`is_recurring: true`) - monitoring: *"keep watching this niche and tell me weekly."*
 - **Satellite** - creator, sound & video deep-dives: *"tell me about this creator / why did this video pop?"*
-- **Trends** - regional (global/us/gb/au), momentum-ranked trend detection, including a free `emerging` feed for "what's about to take off."
+- **Topic Trends** - what people are talking about, by region (global/us/gb/au), momentum-ranked, with category filters (e.g. pop culture without politics) and an `emerging` feed for "what's about to take off" ($0.25).
 
 ## Plugin structure
 
