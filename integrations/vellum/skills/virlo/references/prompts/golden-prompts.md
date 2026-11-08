@@ -6,7 +6,7 @@ These are the prompts the Vellum + Virlo integration **must handle well**. Treat
 
 > **"What kind of content is trending on TikTok in the city of London?"**
 
-Expected behavior: kick off a one-shot Content Research Agent (`POST /v1/agents`, `is_recurring: false`) scoped to `platforms: ["tiktok"]` with specific London-fitness-style multi-word keywords derived from the user's niche. Tell the user it takes ~15–20 min, then finalize and summarize. (For a live regional pulse without a scrape, `GET /v1/trends/emerging?region=gb` is the instant path.)
+Expected behavior: kick off a one-shot Content Research Agent (`POST /v1/agents`, `is_recurring: false`) scoped to `platforms: ["tiktok"]` with specific London-fitness-style multi-word keywords derived from the user's niche. Tell the user it takes ~15–20 min, then finalize and summarize. (For a live regional pulse without a scrape, `GET /v1/topic-trends/emerging?region=gb` ($0.25) is the instant path.)
 
 ### Follow-ups the assistant must handle after a run finalizes
 
@@ -31,8 +31,9 @@ Expected: create a recurring Content Research Agent (`is_recurring: true`, `cade
 
 ## Quick pulse
 
-> **"What's emerging on TikTok in the UK right now?"** → `GET /v1/trends/emerging?region=gb` (free).
-> **"What's trending today?"** → `GET /v1/trends/digest`.
+> **"What's emerging on TikTok in the UK right now?"** → `GET /v1/topic-trends/emerging?region=gb` ($0.25).
+> **"What's trending today?"** → `GET /v1/topic-trends/today` ($0.25).
+> **"What pop culture is trending in Australia, nothing political?"** → `GET /v1/topic-trends/today?region=au&exclude_category=politics,news` ($0.25).
 
 ## Billing edge cases the assistant must handle gracefully
 
